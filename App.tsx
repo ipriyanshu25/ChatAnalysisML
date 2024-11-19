@@ -1,62 +1,40 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import ChatAnalysisDashboard from './chatanalysisdashboard';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import './App.css';
-const Home = () => <h1>Welcome to the Home Page</h1>;
+
+import LandingPage from './components/LandingPage';
+import ChatAnalysisDashboard from './components/chatanalysisdashboard';
+import LoginForm from "./components/login";
+import { AuthProvider, AuthContext } from './context/AuthContext';
+
+// Protected Route component
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = React.useContext(AuthContext);
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+};
 
 const App: React.FC = () => {
   return (
-    <Router>
-      <div>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/chatanalysisdashboard">ChatanalysisDashboard</Link>
-            </li>
-          </ul>
-        </nav>
-
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/chatAnalysisdashboard" element={<ChatAnalysisDashboard/>} />
-        </Routes>
-      </div>
-    </Router>
+    <GoogleOAuthProvider clientId="19574995697-710ot2mo8etfvhvtq2d8m4bdgkb7m34d.apps.googleusercontent.com">
+      <Router>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginForm />} />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <ChatAnalysisDashboard />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </AuthProvider>
+      </Router>
+    </GoogleOAuthProvider>
   );
 };
 
 export default App;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// test = "Welcome to My Home Page"
